@@ -1,0 +1,8 @@
+include README.md LICENSE DATA_SOURCES.md requirements.txt
+recursive-include docs *.md
+prune data
+prune models
+prune reports
+prune work
+prune .git
+global-exclude __pycache__ *.py[cod]

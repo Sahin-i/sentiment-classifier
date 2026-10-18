@@ -1,0 +1,187 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Review sentiment | Experiment report</title><style>
+    :root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#f4f6fa;color:#1a2942;font:16px/1.7 system-ui,Segoe UI,sans-serif}header{background:#142b45;color:#fff;padding:22px 6%;display:flex;justify-content:space-between;gap:20px}header b{letter-spacing:.12em;font-size:13px}header span{font-size:13px;color:#bcd0e4}main{max-width:1120px;margin:38px auto;background:#fff;padding:48px 58px;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 8px 35px #1a294209}h1{font-size:38px;line-height:1.2;letter-spacing:-.04em;margin:0 0 22px}h2{font-size:25px;margin:48px 0 16px;padding-top:20px;border-top:1px solid #e4eaf2;letter-spacing:-.025em}h3{margin-top:30px}a{color:#1b628d;text-underline-offset:3px}p{margin:15px 0}blockquote{margin:22px 0;padding:16px 22px;background:#edf5fa;border-left:4px solid #3385b6;border-radius:0 8px 8px 0}table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5}th{background:#eaf0f6;text-align:left;white-space:nowrap}th,td{padding:12px 14px;border-bottom:1px solid #dfe7f0}tr:nth-child(even) td{background:#f8fafc}.table-wrap{overflow:auto;border:1px solid #dfe7f0;border-radius:8px;margin:20px 0}code{font:13px/1.6 Consolas,monospace;background:#edf2f7;border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{background:#142b45;color:#f0f6ff;padding:20px;border-radius:9px;overflow:auto}pre code{background:none;padding:0;color:inherit}img{display:block;width:100%;height:auto;margin:25px auto}li{margin:6px 0}footer{max-width:1120px;margin:20px auto 40px;font-size:13px;color:#596b82}@media(max-width:750px){main{margin:15px;padding:24px 20px}h1{font-size:30px}header{padding:18px}header span{display:none}th,td{padding:9px}}@media print{body{background:#fff}main{border:0;box-shadow:none;margin:0;padding:10px}header{display:none}h2{break-after:avoid}tr,img,blockquote{break-inside:avoid}}</style></head><body><header><b>REVIEW SENTIMENT / EXPERIMENT 001</b><span>Real data · Shared splits · Measured results</span></header><main><h1 id="product-review-sentiment-classifier">Product review sentiment classifier</h1>
+<p>Executed comparison · 10,000 real reviews · Three sentiment classes · CPU training and inference</p>
+<p><strong>Test macro-F1 winner: TF-IDF + Logistic Regression. Recommended deployment: TF-IDF + Logistic Regression.</strong> Both models were fitted to the same 7,000 training reviews, selected on the same 1,500 validation reviews, and evaluated on the same 1,500 untouched test reviews.</p>
+<blockquote>The comparison is genuine: the submission includes trained weights, original inputs, saved split IDs, row-level probabilities, measured resource costs, and tests that reject mismatched splits. No reported metric is a placeholder.</blockquote>
+<h2 id="1-data-and-labeling">1. Data and labeling</h2>
+<p>Source: nicapotato&#x27;s <a href="https://www.kaggle.com/datasets/nicapotato/womens-ecommerce-clothing-reviews">Women&#x27;s E-Commerce Clothing Reviews</a>, CC0. Review body is the only input; stars produce the target. 1–2 stars = negative, 3 = neutral, 4–5 = positive. Neutral is an average-rating proxy and often expresses mixed sentiment, rather than purely factual language.</p>
+<p>Cleaning started with 23,486 source rows: 845 missing/empty bodies, 0 invalid ratings, 7 redundant normalized duplicates and 0 rows in contradictory duplicate groups were removed. 22,634 unique eligible reviews remained. A stratified random sample of 10,000 preserves natural label prevalence; no test-set balancing was applied.</p>
+<div class="table-wrap"><table><thead><tr><th>Class</th><th>Sample n</th><th>Share</th><th>Train</th><th>Validation</th><th>Test</th><th>Train weight</th></tr></thead><tbody>
+<tr><td>negative</td><td>1047</td><td>10.47%</td><td>733</td><td>157</td><td>157</td><td>3.183</td></tr>
+<tr><td>neutral</td><td>1247</td><td>12.47%</td><td>873</td><td>187</td><td>187</td><td>2.673</td></tr>
+<tr><td>positive</td><td>7706</td><td>77.06%</td><td>5394</td><td>1156</td><td>1156</td><td>0.433</td></tr>
+</tbody></table></div>
+<p>The majority-to-minority ratio is 7.36:1. Always predicting positive gives 77.07% test accuracy but only 0.2902 macro F1. This is why accuracy alone would mislead.</p>
+<p>Both models use inverse-frequency weights computed only on their training labels: w(c) = N / (K × count(c)). Logistic Regression uses class_weight=&#x27;balanced&#x27;; BERT uses the same weights in cross-entropy. This increases minority-class influence without changing test prevalence. No resampling was used.</p>
+<h2 id="2-preprocessing-and-model-choices">2. Preprocessing and model choices</h2>
+<p>Common cleaning decodes HTML entities, removes HTML tags and zero-width characters, applies Unicode NFKC normalization and collapses whitespace. Negation, punctuation, sentence order and sentiment-bearing words are preserved. Exact casefolded cleaned text is deduplicated before splitting; conflicting duplicate labels are excluded. Ratings, recommendation flags, age, title, clothing ID and product categories are never features.</p>
+<p><strong>Classical baseline:</strong> scikit-learn TF-IDF unigrams/bigrams, 40,000-feature cap, min_df=2, max_df=0.99, sublinear term frequency, followed by class-weighted multinomial Logistic Regression. The default word tokenizer drops punctuation and one-letter tokens. Vocabulary and IDF are learned only on train. C ∈ {0.5, 2, 8} is selected by validation macro F1.</p>
+<p><strong>Transformer:</strong> Hugging Face <a href="https://huggingface.co/prajjwal1/bert-tiny">prajjwal1/bert-tiny</a>, pinned revision <code>6f75de8b60a9f8a2fdf7b69cbd86d9e64bcb3837</code>. This is a language-pretrained two-layer encoder with hidden size 128. A new three-class head and all encoder parameters were actually fine-tuned here; this is not zero-shot sentiment inference. The resulting model has 4,386,307 parameters. Uncased WordPiece tokenization, dynamic padding, maximum 192 tokens, weighted cross-entropy, AdamW lr=0.0003, weight decay=0.01, batch size 32, 10% linear warmup and gradient clipping at 1.0 were used for five epochs. The best validation macro-F1 checkpoint is kept (epoch 5). 0.00% of training reviews exceed 192 tokens and are right-truncated.</p>
+<p>The compact transformer makes the complete experiment reproducible on a CPU. No GPU, paid API, hosted inference service or full-size BERT fine-tuning is required. This compares two practical pipelines with their stated search budgets; it does not isolate architecture under equal optimization budgets.</p>
+<h2 id="3-identical-split-audit">3. Identical-split audit</h2>
+<p>Seed 42; stratified 70/15/15 train/validation/test after cleaning and sampling. The shared <code>data/splits.json</code> is the sole source of membership. Every training run records the SHA-256 of that file, the dataset snapshot and ordered IDs. Evaluation rechecks them, and report generation checks row-level ID and gold-label equality. A mismatch raises an error and rejects the comparison. Test text is used only for predictions, benchmark timing and post-evaluation analysis.</p>
+<div class="table-wrap"><table><thead><tr><th>Partition</th><th>Rows</th><th>SHA-256 of ordered IDs (both models)</th></tr></thead><tbody>
+<tr><td>train</td><td>7000</td><td><code>425bed305972bfa887f5ed9d95137eb026a0f804c6d3c899819f2fd6b91a7762</code></td></tr>
+<tr><td>validation</td><td>1500</td><td><code>b5ab50308845c41f0082d2fe48fd68096d0f8b84d27f44393bdff281add56df1</code></td></tr>
+<tr><td>test</td><td>1500</td><td><code>9be000b31555080298bec49eb0f45511eaae05435f170abb4042cc50c78f1d15</code></td></tr>
+</tbody></table></div>
+<p>Snapshot SHA-256: <code>09d81aa55a19f8b2f6c696625abe3b4ed289c1c23a1b1250ac9aa46509b531fd</code>. Raw CSV SHA-256: <code>bd93cc515747ad1f87b8bc863c9e40da758509e6db6506a96d06976e61e36ee0</code>.</p>
+<p>The baseline&#x27;s C and transformer&#x27;s checkpoint are selected only on validation. Scalar confidence temperatures are also fitted only on validation. The test set does not determine fitting, hyperparameters, temperature or the CLI&#x27;s model choice. Neither model is refitted on train+validation.</p>
+<h2 id="4-held-out-results">4. Held-out results</h2>
+<div class="table-wrap"><table><thead><tr><th>Model</th><th>Validation macro F1</th><th>Test accuracy</th><th>Test macro F1</th><th>Test weighted F1</th></tr></thead><tbody>
+<tr><td>TF-IDF + Logistic Regression</td><td>0.6273</td><td>0.7953</td><td>0.6087</td><td>0.8058</td></tr>
+<tr><td>Fine-tuned BERT-tiny</td><td>0.6014</td><td>0.7707</td><td>0.5879</td><td>0.7879</td></tr>
+</tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>Model</th><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Test support</th></tr></thead><tbody>
+<tr><td>TF-IDF + Logistic Regression</td><td>negative</td><td>0.4865</td><td>0.4586</td><td>0.4721</td><td>157</td></tr>
+<tr><td>TF-IDF + Logistic Regression</td><td>neutral</td><td>0.3802</td><td>0.5348</td><td>0.4444</td><td>187</td></tr>
+<tr><td>TF-IDF + Logistic Regression</td><td>positive</td><td>0.9376</td><td>0.8832</td><td>0.9096</td><td>1156</td></tr>
+<tr><td>Fine-tuned BERT-tiny</td><td>negative</td><td>0.4899</td><td>0.4650</td><td>0.4771</td><td>157</td></tr>
+<tr><td>Fine-tuned BERT-tiny</td><td>neutral</td><td>0.3199</td><td>0.5080</td><td>0.3926</td><td>187</td></tr>
+<tr><td>Fine-tuned BERT-tiny</td><td>positive</td><td>0.9374</td><td>0.8547</td><td>0.8941</td><td>1156</td></tr>
+</tbody></table></div>
+<p><img alt="Per-class F1 for both models" src="charts/per_class_f1.png"></p>
+<p><img alt="Confusion matrices: rows are true labels, columns predictions" src="charts/confusion_matrices.png"></p>
+<p>Transformer minus baseline macro F1 = -0.0208; paired stratified bootstrap 95% percentile interval [-0.0592, +0.0153], 1,000 resamples, seed 2026. The interval reflects resampling uncertainty on these fixed predictions, not variability across training seeds. Baseline-only correct: 133; transformer-only correct: 96; exact McNemar p=0.01717 (accuracy disagreement, not a test of macro F1).</p>
+<p>The interval includes zero, so this test does not establish a clear population-level macro-F1 advantage; cost and validation evidence still support the practical choice.</p>
+<h2 id="5-measured-simplicity-and-resource-costs">5. Measured simplicity and resource costs</h2>
+<div class="table-wrap"><table><thead><tr><th>Model</th><th>Train/selection sec</th><th>Train RSS MiB</th><th>Eval RSS MiB</th><th>Saved MiB</th><th>p50 ms/review</th><th>p95 ms/review</th><th>Batch reviews/sec</th></tr></thead><tbody>
+<tr><td>TF-IDF + Logistic Regression</td><td>5.3</td><td>228.4</td><td>175.4</td><td>1.22</td><td>0.559</td><td>0.663</td><td>13776</td></tr>
+<tr><td>Fine-tuned BERT-tiny</td><td>205.1</td><td>866.5</td><td>480.3</td><td>17.64</td><td>2.007</td><td>2.734</td><td>955</td></tr>
+</tbody></table></div>
+<p>CPU only, four intra-op/BLAS threads. Training costs include all three baseline C fits or all five transformer epochs and validation, plus saving the selected model; they exclude dependency installation/downloads and initial imports. RSS is sampled process resident memory, including loaded libraries, in separate model processes; it is not GPU VRAM or a precise tensor allocation measure. Saved sizes are compressed baseline weights versus transformer safetensors/tokenizer/config; metadata and calibration JSON are excluded.</p>
+<p>CPU only, 4 intra-op/BLAS threads, three warmups, serial request batch size 1, identical first 128 ordered test reviews repeated three times. Includes tokenization/vectorization and forward pass; excludes imports, model load, disk I/O, queue/network overhead and temperature softmax. Batch throughput uses all 128 inputs (transformer internal batches 32).</p>
+<p>These are measurements on this Windows laptop, not a production SLA. First-load times and the complete environment are in the JSON artifacts. Imports/loading, concurrency, token lengths and deployment hardware can substantially change real service latency.</p>
+<h2 id="6-error-analysis">6. Error analysis</h2>
+<p>The cases below are actual held-out misclassifications, selected after evaluation to illustrate failures rather than to estimate their prevalence. Every hypothesis is an interpretation of the text, not proof about hidden model reasoning. Full source bodies and predictions are included for inspection.</p>
+<h3 id="tf-idf-logistic-regression-clothing-2258-rating-proxy-versus-textual-sentiment">TF-IDF + Logistic Regression · clothing:2258 · Rating proxy versus textual sentiment</h3>
+<p>Gold: <strong>neutral</strong> (3 stars). Predicted: <strong>negative</strong>. Calibrated confidence: 0.983.</p>
+<blockquote>Hangs terribly off the chest. tent-like. looks maternity. no thanks.</blockquote>
+<p>Hypothesis: The body is almost entirely critical: &#x27;hangs terribly&#x27;, &#x27;tent-like&#x27; and &#x27;no thanks&#x27; all support negative language, yet the source gives three stars. The model may be following the words reasonably while failing the rating-derived neutral target. The text alone does not explain the reviewer&#x27;s average rating. This illustrates weak-label ambiguity rather than establishing a wrong source annotation.</p>
+<h3 id="tf-idf-logistic-regression-clothing-17768-mixed-sentiment-and-aspect-trade-off">TF-IDF + Logistic Regression · clothing:17768 · Mixed sentiment and aspect trade-off</h3>
+<p>Gold: <strong>neutral</strong> (3 stars). Predicted: <strong>positive</strong>. Calibrated confidence: 0.972.</p>
+<blockquote>Love these pants. ordered in petite .,love style, great fit but so long . keeping but have to get hemmed 2 1/2 inches. decided to order the black &amp; green as well.</blockquote>
+<p>Hypothesis: Repeated positive phrases about love, style and fit, plus ordering more colors, can outweigh the local &#x27;but so long&#x27; complaint in a bag of weighted n-grams. The reviewer apparently penalizes the need for hemming enough to award three stars. TF-IDF does not explicitly represent how an alteration cost changes the overall judgment.</p>
+<h3 id="tf-idf-logistic-regression-clothing-8786-negation-and-cumulative-dissatisfaction">TF-IDF + Logistic Regression · clothing:8786 · Negation and cumulative dissatisfaction</h3>
+<p>Gold: <strong>negative</strong> (2 stars). Predicted: <strong>neutral</strong>. Calibrated confidence: 0.968.</p>
+<blockquote>I loved the look of this sweater on-line, but it just didn&#x27;t work for me. the fit wasn&#x27;t good enough. the style okay. the color fine. the feel, scratchy. overall, it did not work for my body.</blockquote>
+<p>Hypothesis: The opening &#x27;loved the look&#x27; and mild descriptors &#x27;okay&#x27; and &#x27;fine&#x27; coexist with several negatives about fit, scratchiness and not working for the body. Local n-grams can represent some negation but may average these aspects into neutral instead of recognizing the cumulative rejection reflected in two stars. The final negative judgment should receive more weight than isolated mild praise.</p>
+<h3 id="tf-idf-logistic-regression-clothing-19099-historical-praise-versus-current-quality-failure">TF-IDF + Logistic Regression · clothing:19099 · Historical praise versus current quality failure</h3>
+<p>Gold: <strong>negative</strong> (2 stars). Predicted: <strong>positive</strong>. Calibrated confidence: 0.901.</p>
+<blockquote>I&#x27;ve been wearing these shorts for years, i work outside and it was great to have comfortable jean shorts that were just the perfect length. the fabric quality on these shorts (and many many other retailer items) has gone down. sure, they&#x27;re great when you try them on in the store..soft, comfortable, flattering, but when these are worn for a day they get so stretched out that i feel like i need a belt to keep them on. i wore these several times, sat down on a relatively smooth concrete wall, and a</blockquote>
+<p>Hypothesis: Much of the vocabulary praises previous comfort, length and the store try-on experience. The complaint is a change over time: quality has declined and the shorts stretch during wear. Unordered n-grams may give historical praise too much influence. The provided source body also ends abruptly, so the model lacks any later conclusion; no missing continuation is assumed here.</p>
+<h3 id="tf-idf-logistic-regression-clothing-3508-personal-fit-criticism-despite-positive-stars">TF-IDF + Logistic Regression · clothing:3508 · Personal fit criticism despite positive stars</h3>
+<p>Gold: <strong>positive</strong> (4 stars). Predicted: <strong>neutral</strong>. Calibrated confidence: 0.932.</p>
+<blockquote>Well first off i knew a jumpsuit was going to be a gamble for me- i have a long torso at 6 feet , but i just loved the print and the style and typically all things sactuary so i was willing to risk it. sadly the torso length was an issue and it seemed to run small to me-i ordered a small which usually would fit fine, but ended up pulling across my hips and with the patten being what it is... well on me it just wasn&#x27;t flattering or comfortable.</blockquote>
+<p>Hypothesis: The reviewer praises the print and style but then describes a short torso, pulling across the hips and an unflattering, uncomfortable fit. That wording supports mixed or negative personal experience, although the rating is four stars. The model may conflate poor fit for this individual with a low overall product rating, which cannot be resolved confidently from this body alone.</p>
+<h3 id="fine-tuned-bert-tiny-clothing-5291-conditional-praise-and-negation-scope">Fine-tuned BERT-tiny · clothing:5291 · Conditional praise and negation scope</h3>
+<p>Gold: <strong>negative</strong> (2 stars). Predicted: <strong>positive</strong>. Calibrated confidence: 0.897.</p>
+<blockquote>This a great skirt for someone with a straight or boyish figure. this skirt does not accommodate a curvy figure - small waist, feminine hips.</blockquote>
+<p>Hypothesis: &#x27;Great skirt&#x27; applies specifically to someone with a straight figure; the following sentence says it does not accommodate a curvy figure. The model may overweight the general praise and attractive descriptors rather than binding them to the condition and the reviewer&#x27;s negative fit assessment. This short review is not plausibly explained by a long-input truncation issue.</p>
+<h3 id="fine-tuned-bert-tiny-clothing-3009-warning-obscured-by-recalled-positive-experience">Fine-tuned BERT-tiny · clothing:3009 · Warning obscured by recalled positive experience</h3>
+<p>Gold: <strong>neutral</strong> (3 stars). Predicted: <strong>positive</strong>. Calibrated confidence: 0.907.</p>
+<blockquote>Let me start off by saying i never write reviews, but feel compelled to so that no one else gets swindled into buying this beautiful one-time wear piece. i absolutely fell in love with this shirt when i bought it in the fall in black... perfect basic to wear under my new draped open vest from retailer! and perfect fit! i&#x27;m long torso-ed and long armed and always have trouble with fit. this being kind of oversized was just loose enough and long enough i could actually feel comfortable wearing it wi</blockquote>
+<p>Hypothesis: The opening warns others against a &#x27;one-time wear&#x27; item and being &#x27;swindled&#x27;, but much of the remaining body enthusiastically recounts initial love and a perfect fit. Tiny BERT may fail to connect the warning to the later remembered praise. The source ends mid-word, limiting evidence about the eventual failure; this is an incomplete supplied review, not proof that the model&#x27;s token cutoff removed the answer.</p>
+<h3 id="fine-tuned-bert-tiny-clothing-5190-unobserved-reason-for-an-average-rating">Fine-tuned BERT-tiny · clothing:5190 · Unobserved reason for an average rating</h3>
+<p>Gold: <strong>neutral</strong> (3 stars). Predicted: <strong>positive</strong>. Calibrated confidence: 0.910.</p>
+<blockquote>I bought this sweater online and was surprised by how thick and fluffy it is. this is a warm and cozy sweater, more bulky than oversized. pattern has a comic book-style art look. it has raglan sleeves and a boxy cut and narrows a bit at the waist. cute, warm sweater for winter--wore with an undershirt.</blockquote>
+<p>Hypothesis: Warm, cozy and cute are positive cues, while bulky and boxy can be either descriptive or critical. The three-star rating may reflect dissatisfaction with thickness or expectations that are only implied in the text. A language-pretrained model fine-tuned on limited rating labels can still miss this understated evaluative meaning and predict positive with excessive confidence.</p>
+<h3 id="fine-tuned-bert-tiny-clothing-21998-practical-caveat-versus-overall-endorsement">Fine-tuned BERT-tiny · clothing:21998 · Practical caveat versus overall endorsement</h3>
+<p>Gold: <strong>positive</strong> (4 stars). Predicted: <strong>negative</strong>. Calibrated confidence: 0.833.</p>
+<blockquote>I really love the look and feel of this top, perhaps this was mentioned in previous reviews, but it is unlined, which i hadn&#x27;t realized when i ordered it. so the eyelet details are will expose skin unless you wear a cami underneath.</blockquote>
+<p>Hypothesis: The reviewer explicitly loves the look and feel, then explains that the unlined eyelet fabric needs an underlayer. The model may interpret exposure and lack of lining as a decisive defect instead of a practical caveat within a four-star endorsement. This suggests difficulty weighting aspect-level information against the review&#x27;s overall positive stance.</p>
+<h3 id="fine-tuned-bert-tiny-clothing-1163-service-complaint-versus-product-rating">Fine-tuned BERT-tiny · clothing:1163 · Service complaint versus product rating</h3>
+<p>Gold: <strong>positive</strong> (4 stars). Predicted: <strong>negative</strong>. Calibrated confidence: 0.836.</p>
+<blockquote>I really wanted this. they had two size small in my local retailer, both were damaged. so disappointing. i don&#x27;t want to pay shipping for one that hopefully isn&#x27;t damaged:( in the last year i&#x27;ve had multiple quality control issues with retailer. makes me gun shy. not sure i&#x27;m getting what i pay for anymore.</blockquote>
+<p>Hypothesis: The language is consistently disappointed about damaged store stock, shipping and retailer quality control, yet the product receives four stars. The model appears to capture negative sentiment in the body while the target may represent a separate judgment of the desired item. Product-versus-service aspect separation and rating-proxy ambiguity both offer explanations; the text does not prove which one caused the error.</p>
+<h3 id="systematic-weakness-check">Systematic weakness check</h3>
+<div class="table-wrap"><table><thead><tr><th>Model</th><th>Subset</th><th>Test n</th><th>Error rate</th></tr></thead><tbody>
+<tr><td>TF-IDF + Logistic Regression</td><td>Neutral gold label</td><td>187</td><td>46.52%</td></tr>
+<tr><td>TF-IDF + Logistic Regression</td><td>Contains but/however/although/yet</td><td>874</td><td>26.66%</td></tr>
+<tr><td>TF-IDF + Logistic Regression</td><td>No such contrast cue</td><td>626</td><td>11.82%</td></tr>
+<tr><td>Fine-tuned BERT-tiny</td><td>Neutral gold label</td><td>187</td><td>49.20%</td></tr>
+<tr><td>Fine-tuned BERT-tiny</td><td>Contains but/however/although/yet</td><td>874</td><td>29.29%</td></tr>
+<tr><td>Fine-tuned BERT-tiny</td><td>No such contrast cue</td><td>626</td><td>14.06%</td></tr>
+</tbody></table></div>
+<p>Average-rating/neutral reviews expose a recurring boundary problem: they can praise appearance while criticizing fit or value, while stars summarize a personal trade-off. TF-IDF bigrams capture local cues but cannot reliably weigh a long concession against the overall judgment. Tiny BERT has context but limited capacity/data and a 192-token cutoff. Contrast-cue error rates are descriptive and confounded by review difficulty and class mix; the cue itself is not demonstrated to cause errors. The manually reviewed cases and neutral-class metrics support the mixed-sentiment hypothesis, while sarcasm remains an unmeasured possibility.</p>
+<h2 id="7-neutral-class-ablation">7. Neutral-class ablation</h2>
+<p>Both models were also trained from scratch/from the same pretrained encoder as binary classifiers after removing only neutral rows from each saved partition. The original non-neutral row assignments are retained; the polar test IDs are identical across binary and three-class comparisons. Each binary transformer receives a new two-class head, five epochs and validation-only checkpoint selection. Class weights are recalculated on binary training data.</p>
+<div class="table-wrap"><table><thead><tr><th>Model</th><th>Polar test n</th><th>3-way on polar accuracy</th><th>3-way on polar F1</th><th>Binary-trained accuracy</th><th>Binary-trained F1</th></tr></thead><tbody>
+<tr><td>TF-IDF + Logistic Regression</td><td>1313</td><td>0.8324</td><td>0.7404</td><td>0.9254</td><td>0.8177</td></tr>
+<tr><td>Fine-tuned BERT-tiny</td><td>1313</td><td>0.8081</td><td>0.7400</td><td>0.9040</td><td>0.7850</td></tr>
+</tbody></table></div>
+<p>On the same polar test rows, training the binary task changes macro F1 by +0.0773 for TF-IDF + Logistic Regression; +0.0450 for Fine-tuned BERT-tiny. Both binary-trained models score higher here: retaining a neutral output makes these polar decisions harder in this experiment, while enabling the system to represent average/mixed reviews.</p>
+<p>For three-way-on-polar scores, a neutral prediction is counted as an error/false negative; macro F1 averages negative and positive. This isolates evaluation to the exact same polar examples. The ablation changes label space, training population, weights and task difficulty; its differences are not a causal estimate of the effect of adding neutral data alone. Binary scores cannot describe how well the system handles genuinely mixed reviews.</p>
+<h2 id="8-out-of-domain-yelp-test">8. Out-of-domain Yelp test</h2>
+<p>1,000 real Yelp restaurant sentences (500 negative/500 positive) from <a href="https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences">UCI Sentiment Labelled Sentences</a>, Kotzias (2015), <a href="https://doi.org/10.24432/C57604">DOI</a>, CC BY 4.0. These examples are never used for fitting, checkpoint selection or calibration. They differ in domain, length and label prevalence. They provide no neutral gold labels, so neutral recall/F1 cannot be assessed here.</p>
+<div class="table-wrap"><table><thead><tr><th>Model</th><th>3-way exact accuracy</th><th>Polar macro F1 (neutral = error)</th><th>Neutral prediction rate</th><th>Forced-binary diagnostic F1</th></tr></thead><tbody>
+<tr><td>TF-IDF + Logistic Regression</td><td>0.6320</td><td>0.6473</td><td>5.90%</td><td>0.6620</td></tr>
+<tr><td>Fine-tuned BERT-tiny</td><td>0.6620</td><td>0.6989</td><td>10.60%</td><td>0.7222</td></tr>
+</tbody></table></div>
+<p>The forced-binary diagnostic discards the neutral logit and chooses between negative and positive; it is explicitly a different decision rule and is not substituted for the main three-way classifier. Performance here cannot be compared directly to clothing accuracy because the target distribution and annotation process differ. Inspect <code>three_class_*.json</code> for per-class OOD precision/recall/F1 and confusion matrices.</p>
+<p>On the Yelp polar test, BERT&#x27;s macro F1 is 0.6989 versus 0.6473 for the baseline. The ranking reverses in this separate domain check, which limits any claim that the clothing winner generalizes best everywhere.</p>
+<h2 id="9-confidence-calibration">9. Confidence calibration</h2>
+<p>Temperature scaling fits one positive scalar T by minimizing unweighted validation negative log likelihood; test probabilities are softmax(logits/T). It does not alter the predicted class. Baseline logits are log(predict_proba); BERT logits are its raw head outputs. Calibration is not assumed to succeed: the table shows held-out raw and scaled results. ECE uses ten equal-width confidence bins; Brier is the mean sum of squared probability errors across classes (lower is better for all three scores).</p>
+<div class="table-wrap"><table><thead><tr><th>Model</th><th>Confidence</th><th>NLL</th><th>Brier</th><th>ECE (10 bins)</th><th>n confidence ≥0.8</th><th>Accuracy at ≥0.8</th></tr></thead><tbody>
+<tr><td>TF-IDF + Logistic Regression</td><td>raw</td><td>0.6244</td><td>0.3407</td><td>0.1859</td><td>246</td><td>100.00%</td></tr>
+<tr><td>TF-IDF + Logistic Regression</td><td>scaled</td><td>0.5045</td><td>0.2821</td><td>0.0203</td><td>869</td><td>94.94%</td></tr>
+<tr><td>Fine-tuned BERT-tiny</td><td>raw</td><td>0.6322</td><td>0.3403</td><td>0.1134</td><td>1151</td><td>87.14%</td></tr>
+<tr><td>Fine-tuned BERT-tiny</td><td>scaled</td><td>0.5731</td><td>0.3146</td><td>0.1079</td><td>941</td><td>95.32%</td></tr>
+</tbody></table></div>
+<p><img alt="Raw and temperature-scaled reliability diagrams" src="charts/calibration.png"></p>
+<p>Validation is reused for model selection and temperature fitting, so calibration quality may be optimistic; test is still untouched by fitting. A production system should reserve an independent calibration set and assess classwise calibration, particularly after prior/domain shift. Confidence is not a guarantee of correctness; empty bins are not plotted and small bins have high uncertainty.</p>
+<h2 id="10-deployment-verdict">10. Deployment verdict</h2>
+<p><strong>Deploy TF-IDF + Logistic Regression for CPU-only weekly reporting of 10,000 English apparel reviews.</strong> The choice follows validation macro F1, preferring the baseline if within 0.005; this rule does not use test or Yelp outcomes. The test table is an independent check on that choice. The stated workload prioritizes minority-class visibility, easy reproducible retraining and low operating cost.</p>
+<p>The selected model&#x27;s test macro F1 is 0.6087, neutral F1 is 0.4444, CPU p50 is 0.559 ms/review, and saved artifact size is 1.22 MiB. These measured costs and class-level errors make the recommendation assessable, rather than assuming the transformer must win. The other model remains available through the same CLI.</p>
+<p>Use calibrated probabilities to flag uncertain cases for review, validate any operational confidence threshold on a fresh sample, and report neutral separately in dashboards. A three-class sentiment model is not an urgency classifier: a real-time support-triage deployment needs support-ticket labels, urgency/recall targets and its own latency test. For a larger or more varied offline corpus, evaluate a stronger review-tuned transformer on a newly held-out set before changing the recommendation.</p>
+<p>This recommendation is for human-reviewed aggregate reporting. With the measured negative/neutral F1 scores, neither model is ready for unattended per-review decisions requiring reliable minority-class recognition. Audit a fresh sample before operational use.</p>
+<h2 id="11-reproduce-and-test-live">11. Reproduce and test live</h2>
+<p>Python 3.12 is recommended. All data, original pretrained weights and fitted models are bundled; inference and training run offline after package installation. From the project directory:</p>
+<pre><code>python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python -m sentiment.cli --text &quot;Nice color, but the fit is just okay.&quot;
+python -m sentiment.cli --model transformer --file examples/reviews.txt
+python reproduce.py
+python -m unittest discover -s tests -v</code></pre>
+<p><code>python reproduce.py --evaluate-only</code> reuses the fitted models and regenerates predictions, calibration, timing, figures and reports. <code>python scripts/download_inputs.py</code> restores missing original inputs after checking their recorded hashes. Full retraining may have small numerical differences across OS/BLAS/PyTorch versions despite deterministic seeds; the saved split membership stays exact.</p>
+<h2 id="12-scope-and-limitations">12. Scope and limitations</h2>
+<ul>
+<li>Ratings are weak labels; three-star text is not always linguistically neutral. Error review cannot establish that the source rating is incorrect.</li>
+</ul>
+<ul>
+<li>The split is by review, not product or author. Exact normalized duplicates are removed, but near duplicates and shared products may remain; author IDs are unavailable. Product-held-out and temporal generalization are unmeasured.</li>
+</ul>
+<ul>
+<li>This is one seed and a 10,000-review sample. The bootstrap does not replace repeated training runs or a larger test of minority classes.</li>
+</ul>
+<ul>
+<li>Results concern a compact, actually fine-tuned BERT model. They do not establish that classical ML beats all transformers. Model size and tuning effort matter.</li>
+</ul>
+<ul>
+<li>The transformer truncates long inputs; inference exposes a truncated flag. The baseline sees the full review but loses global order. Neither pipeline explicitly handles sarcasm or aspect-level sentiment.</li>
+</ul>
+<ul>
+<li>Yelp checks domain and sentence-length shift, only for polar labels. It cannot establish three-class deployment quality on restaurants or support messages.</li>
+</ul>
+<ul>
+<li>CPU timing and sampled RSS are local measurements. Loading, service overhead, concurrency and GPU behavior require separate production benchmarks.</li>
+</ul>
+<h2 id="13-requirement-evidence">13. Requirement evidence</h2>
+<div class="table-wrap"><table><thead><tr><th>Requirement</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>≥1,000 real labeled examples</td><td>10,000 review snapshot; original 23,486-row CSV; data/splits.json provenance/hashes</td></tr>
+<tr><td>Positive / negative / neutral</td><td>Three-star mapping, saved label config, live CLI</td></tr>
+<tr><td>scikit-learn classical baseline</td><td>sentiment/experiment.py; fitted TF-IDF + Logistic Regression artifact</td></tr>
+<tr><td>Hugging Face transformer</td><td>Actual BERT-tiny fine-tuning; safetensors weights and epoch/validation history</td></tr>
+<tr><td>Identical train/test splits</td><td>One manifest; training/evaluation ID hashes; row-level audit tests</td></tr>
+<tr><td>Per-class precision/recall/F1</td><td>Section 4; reports/per_class_metrics.csv; full JSON reports</td></tr>
+<tr><td>Class imbalance measured/handled</td><td>Section 1; train-only class weights for both models</td></tr>
+<tr><td>≥5 reviewed errors</td><td>Section 6; 10 actual errors, at least five per model, reports/error_reviews.json</td></tr>
+<tr><td>Deployment recommendation</td><td>Section 10; measured accuracy/F1, latency, memory and size</td></tr>
+<tr><td>Bonus: neutral ablation</td><td>Section 7; two separately trained binary models on the original polar row IDs</td></tr>
+<tr><td>Bonus: out-of-domain</td><td>Section 8; 1,000 unseen real Yelp sentences, both models</td></tr>
+<tr><td>Bonus: calibration</td><td>Section 9; validation-fitted temperature, test reliability/ECE/Brier/NLL</td></tr>
+<tr><td>Bonus: live CLI</td><td>sentiment/cli.py; defaults to validation-selected recommended model</td></tr>
+</tbody></table></div>
+<h2 id="sources">Sources</h2>
+<p>Dataset/model links are cited where used. Full source attribution, licenses, pretrained revision and implementation references are in <a href="../DATA_SOURCES.md">DATA_SOURCES.md</a>. Every table is computed from this project&#x27;s model outputs.</p></main><footer>All metrics derive from the included predictions. See README.md for reproduction commands and DATA_SOURCES.md for licenses.</footer></body></html>

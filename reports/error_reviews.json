@@ -1,0 +1,62 @@
+[
+  {
+    "model": "baseline",
+    "id": "clothing:2258",
+    "category": "Rating proxy versus textual sentiment",
+    "hypothesis": "The body is almost entirely critical: 'hangs terribly', 'tent-like' and 'no thanks' all support negative language, yet the source gives three stars. The model may be following the words reasonably while failing the rating-derived neutral target. The text alone does not explain the reviewer's average rating. This illustrates weak-label ambiguity rather than establishing a wrong source annotation."
+  },
+  {
+    "model": "baseline",
+    "id": "clothing:17768",
+    "category": "Mixed sentiment and aspect trade-off",
+    "hypothesis": "Repeated positive phrases about love, style and fit, plus ordering more colors, can outweigh the local 'but so long' complaint in a bag of weighted n-grams. The reviewer apparently penalizes the need for hemming enough to award three stars. TF-IDF does not explicitly represent how an alteration cost changes the overall judgment."
+  },
+  {
+    "model": "baseline",
+    "id": "clothing:8786",
+    "category": "Negation and cumulative dissatisfaction",
+    "hypothesis": "The opening 'loved the look' and mild descriptors 'okay' and 'fine' coexist with several negatives about fit, scratchiness and not working for the body. Local n-grams can represent some negation but may average these aspects into neutral instead of recognizing the cumulative rejection reflected in two stars. The final negative judgment should receive more weight than isolated mild praise."
+  },
+  {
+    "model": "baseline",
+    "id": "clothing:19099",
+    "category": "Historical praise versus current quality failure",
+    "hypothesis": "Much of the vocabulary praises previous comfort, length and the store try-on experience. The complaint is a change over time: quality has declined and the shorts stretch during wear. Unordered n-grams may give historical praise too much influence. The provided source body also ends abruptly, so the model lacks any later conclusion; no missing continuation is assumed here."
+  },
+  {
+    "model": "baseline",
+    "id": "clothing:3508",
+    "category": "Personal fit criticism despite positive stars",
+    "hypothesis": "The reviewer praises the print and style but then describes a short torso, pulling across the hips and an unflattering, uncomfortable fit. That wording supports mixed or negative personal experience, although the rating is four stars. The model may conflate poor fit for this individual with a low overall product rating, which cannot be resolved confidently from this body alone."
+  },
+  {
+    "model": "transformer",
+    "id": "clothing:5291",
+    "category": "Conditional praise and negation scope",
+    "hypothesis": "'Great skirt' applies specifically to someone with a straight figure; the following sentence says it does not accommodate a curvy figure. The model may overweight the general praise and attractive descriptors rather than binding them to the condition and the reviewer's negative fit assessment. This short review is not plausibly explained by a long-input truncation issue."
+  },
+  {
+    "model": "transformer",
+    "id": "clothing:3009",
+    "category": "Warning obscured by recalled positive experience",
+    "hypothesis": "The opening warns others against a 'one-time wear' item and being 'swindled', but much of the remaining body enthusiastically recounts initial love and a perfect fit. Tiny BERT may fail to connect the warning to the later remembered praise. The source ends mid-word, limiting evidence about the eventual failure; this is an incomplete supplied review, not proof that the model's token cutoff removed the answer."
+  },
+  {
+    "model": "transformer",
+    "id": "clothing:5190",
+    "category": "Unobserved reason for an average rating",
+    "hypothesis": "Warm, cozy and cute are positive cues, while bulky and boxy can be either descriptive or critical. The three-star rating may reflect dissatisfaction with thickness or expectations that are only implied in the text. A language-pretrained model fine-tuned on limited rating labels can still miss this understated evaluative meaning and predict positive with excessive confidence."
+  },
+  {
+    "model": "transformer",
+    "id": "clothing:21998",
+    "category": "Practical caveat versus overall endorsement",
+    "hypothesis": "The reviewer explicitly loves the look and feel, then explains that the unlined eyelet fabric needs an underlayer. The model may interpret exposure and lack of lining as a decisive defect instead of a practical caveat within a four-star endorsement. This suggests difficulty weighting aspect-level information against the review's overall positive stance."
+  },
+  {
+    "model": "transformer",
+    "id": "clothing:1163",
+    "category": "Service complaint versus product rating",
+    "hypothesis": "The language is consistently disappointed about damaged store stock, shipping and retailer quality control, yet the product receives four stars. The model appears to capture negative sentiment in the body while the target may represent a separate judgment of the desired item. Product-versus-service aspect separation and rating-proxy ambiguity both offer explanations; the text does not prove which one caused the error."
+  }
+]

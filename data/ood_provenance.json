@@ -1,0 +1,9 @@
+{
+  "source": "https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences",
+  "citation": "Kotzias, D. (2015). Sentiment Labelled Sentences. UCI. https://doi.org/10.24432/C57604",
+  "license": "CC BY 4.0",
+  "rows": 1000,
+  "archive_sha256": "afc26626d710899948693e1a61405dce197f57ffa719fa1130d346b4cc095343",
+  "snapshot_sha256": "67c752e4a520ed43e52e51afd51a2ff1b092eb9ecaeb85b2fd9ee802d419624c",
+  "notes": "Yelp restaurant sentences; no neutral gold class; never used for fitting, calibration or selection. Text cleaned with the same common function; no other adaptation."
+}

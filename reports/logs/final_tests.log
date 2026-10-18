@@ -1,0 +1,24 @@
+test_confidence_one_is_in_last_bin (test_project.CalibrationBehaviorTests.test_confidence_one_is_in_last_bin) ... ok
+test_overconfident_errors_temperature_improves_nll (test_project.CalibrationBehaviorTests.test_overconfident_errors_temperature_improves_nll) ... ok
+test_all_classes_and_no_leakage (test_project.DataIntegrityTests.test_all_classes_and_no_leakage) ... ok
+test_binary_is_same_polar_membership (test_project.DataIntegrityTests.test_binary_is_same_polar_membership) ... ok
+test_modified_snapshot_is_rejected (test_project.DataIntegrityTests.test_modified_snapshot_is_rejected) ... ok
+test_modified_split_is_rejected (test_project.DataIntegrityTests.test_modified_split_is_rejected) ... ok
+test_preprocessing_preserves_negation_and_punctuation (test_project.DataIntegrityTests.test_preprocessing_preserves_negation_and_punctuation) ... ok
+test_real_source_and_minimum_size (test_project.DataIntegrityTests.test_real_source_and_minimum_size) ... ok
+test_actual_finetuning_and_balanced_weights (test_project.EvaluationArtifactTests.test_actual_finetuning_and_balanced_weights) ... ok
+test_both_models_used_same_all_partitions (test_project.EvaluationArtifactTests.test_both_models_used_same_all_partitions) ... ok
+test_five_real_reviewed_errors_per_model (test_project.EvaluationArtifactTests.test_five_real_reviewed_errors_per_model) ... ok
+test_latency_compares_same_reviews (test_project.EvaluationArtifactTests.test_latency_compares_same_reviews) ... ok
+test_metrics_recompute_from_predictions (test_project.EvaluationArtifactTests.test_metrics_recompute_from_predictions) ... ok
+test_ood_never_in_main_split (test_project.EvaluationArtifactTests.test_ood_never_in_main_split) ... ok
+test_probability_and_calibration_invariants (test_project.EvaluationArtifactTests.test_probability_and_calibration_invariants) ... ok
+test_cli_returns_json_and_rejects_blank_input (test_project.LivePredictionTests.test_cli_returns_json_and_rejects_blank_input) ... ok
+test_each_saved_model_predicts_valid_distribution (test_project.LivePredictionTests.test_each_saved_model_predicts_valid_distribution) ... ok
+test_empty_reviews_are_rejected (test_project.LivePredictionTests.test_empty_reviews_are_rejected) ... ok
+test_live_logits_match_saved_test_predictions (test_project.LivePredictionTests.test_live_logits_match_saved_test_predictions) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 16.242s
+
+OK

@@ -1,0 +1,79 @@
+{
+  "training_seconds": 2.984209300000657,
+  "validation_macro_f1": 0.8598103810624337,
+  "candidates": [
+    {
+      "C": 0.5,
+      "validation_macro_f1": 0.826971918727238
+    },
+    {
+      "C": 2.0,
+      "validation_macro_f1": 0.8437932437932438
+    },
+    {
+      "C": 8.0,
+      "validation_macro_f1": 0.8598103810624337
+    }
+  ],
+  "selected_C": 8.0,
+  "vocabulary_size": 33716,
+  "hyperparameters": {
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_df": 2,
+    "max_df": 0.99,
+    "max_features": 40000,
+    "sublinear_tf": true,
+    "class_weight": "balanced",
+    "solver": "lbfgs",
+    "max_iter": 1000
+  },
+  "preprocessing": "Common minimal cleaning; TF-IDF lowercases, keeps unigrams/bigrams including negation; no stemming or stopword removal. Default word tokenizer drops punctuation and one-character tokens. TF-IDF vocabulary/IDF fit only on train.",
+  "model": "baseline",
+  "task": "binary",
+  "labels": [
+    "negative",
+    "positive"
+  ],
+  "seed": 42,
+  "threads": 4,
+  "sampled_peak_process_rss_mib": 200.92578125,
+  "class_weights": {
+    "negative": 4.179399727148704,
+    "positive": 0.5679458657767891
+  },
+  "id_hashes": {
+    "train": "c4211dfd7652e663f10a05863c90795fdf9f051719bf765a92383f65506d1f6d",
+    "validation": "5553bf8f86b53a8e56b2713d457112257820575a50f95a6e125c5376f729d24f",
+    "test": "0f88da3eb8c369f9e4d8facb6e6f7f5d68b092f5eeef8a98c142df70d8733d08"
+  },
+  "split_file_sha256": "38cfac1794c919698b99ee3716297d4037e558e4bf459b961fb319b559ea775e",
+  "snapshot_sha256": "09d81aa55a19f8b2f6c696625abe3b4ed289c1c23a1b1250ac9aa46509b531fd",
+  "split_sizes": {
+    "train": 6127,
+    "validation": 1313,
+    "test": 1313
+  },
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "torch": "2.11.0",
+      "transformers": "4.57.6",
+      "scikit-learn": "1.9.1",
+      "numpy": "2.2.0",
+      "scipy": "1.17.1",
+      "joblib": "1.6.0",
+      "tokenizers": "0.22.2",
+      "huggingface-hub": "0.36.0",
+      "safetensors": "0.7.0",
+      "threadpoolctl": "3.6.0",
+      "matplotlib": "3.10.8",
+      "psutil": "7.2.2"
+    }
+  },
+  "selection": "Highest validation macro F1; tie keeps first candidate/earliest epoch. No train+validation refit.",
+  "artifact_bytes": 628663
+}

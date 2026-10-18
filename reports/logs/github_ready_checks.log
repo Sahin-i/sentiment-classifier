@@ -1,0 +1,226 @@
+RUN: python -m pip check
+No broken requirements found.
+EXIT: 0
+
+RUN: python -m ruff check .
+All checks passed!
+EXIT: 0
+
+RUN: python -m ruff format --check .
+13 files already formatted
+EXIT: 0
+
+RUN: python scripts/verify_artifacts.py
+{"artifacts": 54, "status": "verified"}
+EXIT: 0
+
+RUN: python -m unittest discover -s tests -v
+test_confidence_one_is_in_last_bin (test_project.CalibrationBehaviorTests.test_confidence_one_is_in_last_bin) ... ok
+test_overconfident_errors_temperature_improves_nll (test_project.CalibrationBehaviorTests.test_overconfident_errors_temperature_improves_nll) ... ok
+test_all_classes_and_no_leakage (test_project.DataIntegrityTests.test_all_classes_and_no_leakage) ... ok
+test_binary_is_same_polar_membership (test_project.DataIntegrityTests.test_binary_is_same_polar_membership) ... ok
+test_modified_snapshot_is_rejected (test_project.DataIntegrityTests.test_modified_snapshot_is_rejected) ... ok
+test_modified_split_is_rejected (test_project.DataIntegrityTests.test_modified_split_is_rejected) ... ok
+test_preprocessing_preserves_negation_and_punctuation (test_project.DataIntegrityTests.test_preprocessing_preserves_negation_and_punctuation) ... ok
+test_real_source_and_minimum_size (test_project.DataIntegrityTests.test_real_source_and_minimum_size) ... ok
+test_actual_finetuning_and_balanced_weights (test_project.EvaluationArtifactTests.test_actual_finetuning_and_balanced_weights) ... ok
+test_both_models_used_same_all_partitions (test_project.EvaluationArtifactTests.test_both_models_used_same_all_partitions) ... ok
+test_five_real_reviewed_errors_per_model (test_project.EvaluationArtifactTests.test_five_real_reviewed_errors_per_model) ... ok
+test_latency_compares_same_reviews (test_project.EvaluationArtifactTests.test_latency_compares_same_reviews) ... ok
+test_metrics_recompute_from_predictions (test_project.EvaluationArtifactTests.test_metrics_recompute_from_predictions) ... ok
+test_ood_never_in_main_split (test_project.EvaluationArtifactTests.test_ood_never_in_main_split) ... ok
+test_probability_and_calibration_invariants (test_project.EvaluationArtifactTests.test_probability_and_calibration_invariants) ... ok
+test_cli_returns_json_and_rejects_blank_input (test_project.LivePredictionTests.test_cli_returns_json_and_rejects_blank_input) ... ok
+test_each_saved_model_predicts_valid_distribution (test_project.LivePredictionTests.test_each_saved_model_predicts_valid_distribution) ... ok
+test_empty_reviews_are_rejected (test_project.LivePredictionTests.test_empty_reviews_are_rejected) ... ok
+test_live_logits_match_saved_test_predictions (test_project.LivePredictionTests.test_live_logits_match_saved_test_predictions) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 11.445s
+
+OK
+EXIT: 0
+
+RUN: review-sentiment --file examples/reviews.txt
+{"text": "The fabric feels wonderful and the jacket fits perfectly. I love it.", "sentiment": "positive", "confidence": 0.9871731782737964, "probabilities": {"negative": 0.006177460232823834, "neutral": 0.0066493614933797384, "positive": 0.9871731782737964}, "model": "baseline", "calibrated": true, "truncated": false}
+{"text": "The zipper broke on the first day. Very disappointed.", "sentiment": "negative", "confidence": 0.9312137900142894, "probabilities": {"negative": 0.9312137900142894, "neutral": 0.0502401490108038, "positive": 0.01854606097490686}, "model": "baseline", "calibrated": true, "truncated": false}
+{"text": "The color is nice, but the fit is just okay. Nothing special.", "sentiment": "neutral", "confidence": 0.7171052466077382, "probabilities": {"negative": 0.09477698096280708, "neutral": 0.7171052466077382, "positive": 0.18811777242945477}, "model": "baseline", "calibrated": true, "truncated": false}
+EXIT: 0
+
+RUN: python -m build
+* Creating isolated environment: venv+pip...
+* Installing packages in isolated environment:
+  - setuptools>=77,<82
+  - wheel>=0.45,<1
+* Getting build dependencies for sdist...
+running egg_info
+writing product_review_sentiment_classifier.egg-info\PKG-INFO
+writing dependency_links to product_review_sentiment_classifier.egg-info\dependency_links.txt
+writing entry points to product_review_sentiment_classifier.egg-info\entry_points.txt
+writing requirements to product_review_sentiment_classifier.egg-info\requires.txt
+writing top-level names to product_review_sentiment_classifier.egg-info\top_level.txt
+reading manifest file 'product_review_sentiment_classifier.egg-info\SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+no previously-included directories found matching 'data'
+no previously-included directories found matching 'models'
+no previously-included directories found matching 'reports'
+no previously-included directories found matching 'work'
+no previously-included directories found matching '.git'
+warning: no previously-included files matching '__pycache__' found anywhere in distribution
+warning: no previously-included files matching '*.py[cod]' found anywhere in distribution
+adding license file 'LICENSE'
+writing manifest file 'product_review_sentiment_classifier.egg-info\SOURCES.txt'
+* Building sdist...
+running sdist
+running egg_info
+writing product_review_sentiment_classifier.egg-info\PKG-INFO
+writing dependency_links to product_review_sentiment_classifier.egg-info\dependency_links.txt
+writing entry points to product_review_sentiment_classifier.egg-info\entry_points.txt
+writing requirements to product_review_sentiment_classifier.egg-info\requires.txt
+writing top-level names to product_review_sentiment_classifier.egg-info\top_level.txt
+reading manifest file 'product_review_sentiment_classifier.egg-info\SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+no previously-included directories found matching 'data'
+no previously-included directories found matching 'models'
+no previously-included directories found matching 'reports'
+no previously-included directories found matching 'work'
+no previously-included directories found matching '.git'
+warning: no previously-included files matching '__pycache__' found anywhere in distribution
+warning: no previously-included files matching '*.py[cod]' found anywhere in distribution
+adding license file 'LICENSE'
+writing manifest file 'product_review_sentiment_classifier.egg-info\SOURCES.txt'
+running check
+creating product_review_sentiment_classifier-1.0.0
+creating product_review_sentiment_classifier-1.0.0\docs
+creating product_review_sentiment_classifier-1.0.0\product_review_sentiment_classifier.egg-info
+creating product_review_sentiment_classifier-1.0.0\sentiment
+creating product_review_sentiment_classifier-1.0.0\tests
+copying files to product_review_sentiment_classifier-1.0.0...
+copying DATA_SOURCES.md -> product_review_sentiment_classifier-1.0.0
+copying LICENSE -> product_review_sentiment_classifier-1.0.0
+copying MANIFEST.in -> product_review_sentiment_classifier-1.0.0
+copying README.md -> product_review_sentiment_classifier-1.0.0
+copying pyproject.toml -> product_review_sentiment_classifier-1.0.0
+copying requirements.txt -> product_review_sentiment_classifier-1.0.0
+copying docs\PUBLISHING.md -> product_review_sentiment_classifier-1.0.0\docs
+copying product_review_sentiment_classifier.egg-info\PKG-INFO -> product_review_sentiment_classifier-1.0.0\product_review_sentiment_classifier.egg-info
+copying product_review_sentiment_classifier.egg-info\SOURCES.txt -> product_review_sentiment_classifier-1.0.0\product_review_sentiment_classifier.egg-info
+copying product_review_sentiment_classifier.egg-info\dependency_links.txt -> product_review_sentiment_classifier-1.0.0\product_review_sentiment_classifier.egg-info
+copying product_review_sentiment_classifier.egg-info\entry_points.txt -> product_review_sentiment_classifier-1.0.0\product_review_sentiment_classifier.egg-info
+copying product_review_sentiment_classifier.egg-info\requires.txt -> product_review_sentiment_classifier-1.0.0\product_review_sentiment_classifier.egg-info
+copying product_review_sentiment_classifier.egg-info\top_level.txt -> product_review_sentiment_classifier-1.0.0\product_review_sentiment_classifier.egg-info
+copying sentiment\__init__.py -> product_review_sentiment_classifier-1.0.0\sentiment
+copying sentiment\cli.py -> product_review_sentiment_classifier-1.0.0\sentiment
+copying sentiment\common.py -> product_review_sentiment_classifier-1.0.0\sentiment
+copying sentiment\data.py -> product_review_sentiment_classifier-1.0.0\sentiment
+copying sentiment\evaluate.py -> product_review_sentiment_classifier-1.0.0\sentiment
+copying sentiment\experiment.py -> product_review_sentiment_classifier-1.0.0\sentiment
+copying sentiment\models.py -> product_review_sentiment_classifier-1.0.0\sentiment
+copying sentiment\report.py -> product_review_sentiment_classifier-1.0.0\sentiment
+copying tests\test_project.py -> product_review_sentiment_classifier-1.0.0\tests
+copying product_review_sentiment_classifier.egg-info\SOURCES.txt -> product_review_sentiment_classifier-1.0.0\product_review_sentiment_classifier.egg-info
+Writing product_review_sentiment_classifier-1.0.0\setup.cfg
+Creating tar archive
+removing 'product_review_sentiment_classifier-1.0.0' (and everything under it)
+* Building wheel from sdist
+* Creating isolated environment: venv+pip...
+* Installing packages in isolated environment:
+  - setuptools>=77,<82
+  - wheel>=0.45,<1
+* Getting build dependencies for wheel...
+running egg_info
+writing product_review_sentiment_classifier.egg-info\PKG-INFO
+writing dependency_links to product_review_sentiment_classifier.egg-info\dependency_links.txt
+writing entry points to product_review_sentiment_classifier.egg-info\entry_points.txt
+writing requirements to product_review_sentiment_classifier.egg-info\requires.txt
+writing top-level names to product_review_sentiment_classifier.egg-info\top_level.txt
+reading manifest file 'product_review_sentiment_classifier.egg-info\SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+no previously-included directories found matching 'data'
+no previously-included directories found matching 'models'
+no previously-included directories found matching 'reports'
+no previously-included directories found matching 'work'
+no previously-included directories found matching '.git'
+warning: no previously-included files matching '__pycache__' found anywhere in distribution
+warning: no previously-included files matching '*.py[cod]' found anywhere in distribution
+adding license file 'LICENSE'
+writing manifest file 'product_review_sentiment_classifier.egg-info\SOURCES.txt'
+* Building wheel...
+running bdist_wheel
+running build
+running build_py
+creating build\lib\sentiment
+copying sentiment\cli.py -> build\lib\sentiment
+copying sentiment\common.py -> build\lib\sentiment
+copying sentiment\data.py -> build\lib\sentiment
+copying sentiment\evaluate.py -> build\lib\sentiment
+copying sentiment\experiment.py -> build\lib\sentiment
+copying sentiment\models.py -> build\lib\sentiment
+copying sentiment\report.py -> build\lib\sentiment
+copying sentiment\__init__.py -> build\lib\sentiment
+running egg_info
+writing product_review_sentiment_classifier.egg-info\PKG-INFO
+writing dependency_links to product_review_sentiment_classifier.egg-info\dependency_links.txt
+writing entry points to product_review_sentiment_classifier.egg-info\entry_points.txt
+writing requirements to product_review_sentiment_classifier.egg-info\requires.txt
+writing top-level names to product_review_sentiment_classifier.egg-info\top_level.txt
+reading manifest file 'product_review_sentiment_classifier.egg-info\SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+no previously-included directories found matching 'data'
+no previously-included directories found matching 'models'
+no previously-included directories found matching 'reports'
+no previously-included directories found matching 'work'
+no previously-included directories found matching '.git'
+warning: no previously-included files matching '__pycache__' found anywhere in distribution
+warning: no previously-included files matching '*.py[cod]' found anywhere in distribution
+adding license file 'LICENSE'
+writing manifest file 'product_review_sentiment_classifier.egg-info\SOURCES.txt'
+installing to build\bdist.win-amd64\wheel
+running install
+running install_lib
+creating build\bdist.win-amd64\wheel
+creating build\bdist.win-amd64\wheel\sentiment
+copying build\lib\sentiment\cli.py -> build\bdist.win-amd64\wheel\.\sentiment
+copying build\lib\sentiment\common.py -> build\bdist.win-amd64\wheel\.\sentiment
+copying build\lib\sentiment\data.py -> build\bdist.win-amd64\wheel\.\sentiment
+copying build\lib\sentiment\evaluate.py -> build\bdist.win-amd64\wheel\.\sentiment
+copying build\lib\sentiment\experiment.py -> build\bdist.win-amd64\wheel\.\sentiment
+copying build\lib\sentiment\models.py -> build\bdist.win-amd64\wheel\.\sentiment
+copying build\lib\sentiment\report.py -> build\bdist.win-amd64\wheel\.\sentiment
+copying build\lib\sentiment\__init__.py -> build\bdist.win-amd64\wheel\.\sentiment
+running install_egg_info
+Copying product_review_sentiment_classifier.egg-info to build\bdist.win-amd64\wheel\.\product_review_sentiment_classifier-1.0.0-py3.12.egg-info
+running install_scripts
+creating build\bdist.win-amd64\wheel\product_review_sentiment_classifier-1.0.0.dist-info\WHEEL
+creating '<project>\\dist\\.tmp-_vn9tymh\\product_review_sentiment_classifier-1.0.0-py3-none-any.whl' and adding 'build\\bdist.win-amd64\\wheel' to it
+adding 'product_review_sentiment_classifier-1.0.0.dist-info/licenses/LICENSE'
+adding 'sentiment/__init__.py'
+adding 'sentiment/cli.py'
+adding 'sentiment/common.py'
+adding 'sentiment/data.py'
+adding 'sentiment/evaluate.py'
+adding 'sentiment/experiment.py'
+adding 'sentiment/models.py'
+adding 'sentiment/report.py'
+adding 'product_review_sentiment_classifier-1.0.0.dist-info/METADATA'
+adding 'product_review_sentiment_classifier-1.0.0.dist-info/WHEEL'
+adding 'product_review_sentiment_classifier-1.0.0.dist-info/entry_points.txt'
+adding 'product_review_sentiment_classifier-1.0.0.dist-info/top_level.txt'
+adding 'product_review_sentiment_classifier-1.0.0.dist-info/RECORD'
+removing build\bdist.win-amd64\wheel
+Successfully built product_review_sentiment_classifier-1.0.0.tar.gz and product_review_sentiment_classifier-1.0.0-py3-none-any.whl
+EXIT: 0
+
+RUN: python scripts/check_wheel.py
+Processing <project>\dist\product_review_sentiment_classifier-1.0.0-py3-none-any.whl
+Installing collected packages: product-review-sentiment-classifier
+  Attempting uninstall: product-review-sentiment-classifier
+    Found existing installation: product-review-sentiment-classifier 1.0.0
+    Not uninstalling product-review-sentiment-classifier at <workspace>\work\github-venv\lib\site-packages, outside environment <project>\work\wheel-check-_da1rpo8\venv
+    Can't uninstall 'product-review-sentiment-classifier'. No files were found to uninstall.
+Successfully installed product-review-sentiment-classifier-1.0.0
+{"wheel_model": "baseline", "prediction": "positive", "status": "passed"}
+{"wheel_model": "transformer", "prediction": "positive", "status": "passed"}
+EXIT: 0
+
+ALL LOCAL GITHUB-READINESS CHECKS PASSED

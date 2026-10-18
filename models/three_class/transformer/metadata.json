@@ -1,0 +1,102 @@
+{
+  "training_seconds": 205.10829739999826,
+  "validation_macro_f1": 0.6013968908442758,
+  "selected_epoch": 5,
+  "history": [
+    {
+      "epoch": 1,
+      "mean_batch_weighted_loss": 0.9696993974790181,
+      "validation_macro_f1": 0.555451607777742,
+      "seconds": 39.24867499999891
+    },
+    {
+      "epoch": 2,
+      "mean_batch_weighted_loss": 0.7276679393091158,
+      "validation_macro_f1": 0.5963791154939676,
+      "seconds": 40.474812600001314
+    },
+    {
+      "epoch": 3,
+      "mean_batch_weighted_loss": 0.593540710537401,
+      "validation_macro_f1": 0.588460659390892,
+      "seconds": 42.1881323000016
+    },
+    {
+      "epoch": 4,
+      "mean_batch_weighted_loss": 0.4844724420951382,
+      "validation_macro_f1": 0.6013112717073335,
+      "seconds": 40.24570070000118
+    },
+    {
+      "epoch": 5,
+      "mean_batch_weighted_loss": 0.39968654526967434,
+      "validation_macro_f1": 0.6013968908442758,
+      "seconds": 39.918469899999764
+    }
+  ],
+  "parameter_count": 4386307,
+  "max_length": 192,
+  "train_truncated_fraction": 0.0,
+  "pretrained_model": "prajjwal1/bert-tiny",
+  "pretrained_revision": "6f75de8b60a9f8a2fdf7b69cbd86d9e64bcb3837",
+  "training_mode": "All pretrained encoder parameters and a newly initialized classification head fine-tuned on the saved training split; no pretrained sentiment classifier used.",
+  "hyperparameters": {
+    "epochs": 5,
+    "batch_size": 32,
+    "learning_rate": 0.0003,
+    "optimizer": "AdamW",
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.1,
+    "gradient_clip_norm": 1.0,
+    "loss": "class-weighted cross-entropy",
+    "device": "cpu"
+  },
+  "preprocessing": "Common minimal cleaning, uncased BERT WordPiece tokenizer from the pinned checkpoint, dynamic padding, right truncation at max_length including special tokens; punctuation/negation preserved for tokenizer.",
+  "model": "transformer",
+  "task": "three_class",
+  "labels": [
+    "negative",
+    "neutral",
+    "positive"
+  ],
+  "seed": 42,
+  "threads": 4,
+  "sampled_peak_process_rss_mib": 866.4921875,
+  "class_weights": {
+    "negative": 3.1832651205093225,
+    "neutral": 2.6727758686521574,
+    "positive": 0.4325794092201211
+  },
+  "id_hashes": {
+    "train": "425bed305972bfa887f5ed9d95137eb026a0f804c6d3c899819f2fd6b91a7762",
+    "validation": "b5ab50308845c41f0082d2fe48fd68096d0f8b84d27f44393bdff281add56df1",
+    "test": "9be000b31555080298bec49eb0f45511eaae05435f170abb4042cc50c78f1d15"
+  },
+  "split_file_sha256": "38cfac1794c919698b99ee3716297d4037e558e4bf459b961fb319b559ea775e",
+  "snapshot_sha256": "09d81aa55a19f8b2f6c696625abe3b4ed289c1c23a1b1250ac9aa46509b531fd",
+  "split_sizes": {
+    "train": 7000,
+    "validation": 1500,
+    "test": 1500
+  },
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "torch": "2.11.0",
+      "transformers": "4.57.6",
+      "scikit-learn": "1.9.1",
+      "numpy": "2.2.0",
+      "scipy": "1.17.1",
+      "joblib": "1.6.0",
+      "tokenizers": "0.22.2",
+      "huggingface-hub": "0.36.0",
+      "safetensors": "0.7.0",
+      "threadpoolctl": "3.6.0",
+      "matplotlib": "3.10.8",
+      "psutil": "7.2.2"
+    }
+  },
+  "selection": "Highest validation macro F1; tie keeps first candidate/earliest epoch. No train+validation refit.",
+  "artifact_bytes": 18495078
+}

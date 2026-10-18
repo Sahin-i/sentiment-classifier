@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+
+  # Runtime pins match the recorded model artifacts. Upgrade them deliberately
+  # with artifact compatibility tests; automated runtime upgrades are disabled.

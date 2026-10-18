@@ -1,0 +1,35 @@
+# Python environments, build output and caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Local working files and credentials
+work/
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.pem
+*.key
+
+# Release bundles belong in GitHub Releases, outside the source tree
+*.zip
+!data/raw/uci_sentiment.zip
+
+# Keep the recorded evidence, ignore newly generated execution logs
+reports/logs/*
+!reports/logs/final_tests.log
+!reports/logs/github_ready_checks.log

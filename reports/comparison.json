@@ -1,0 +1,44 @@
+{
+  "paired_statistics": {
+    "direction": "transformer minus baseline",
+    "bootstrap_samples": 1000,
+    "bootstrap_seed": 2026,
+    "bootstrap_method": "Paired stratified bootstrap of fixed test predictions; sampling within each true class. Conditional uncertainty for this split, not variation across training seeds.",
+    "macro_f1_delta": -0.020782871955158377,
+    "macro_f1_delta_95_percentile_ci": [
+      -0.05923292330757816,
+      0.015308879556180434
+    ],
+    "baseline_only_correct": 133,
+    "transformer_only_correct": 96,
+    "mcnemar_exact_p": 0.01717154279974242
+  },
+  "binary_ablation": {
+    "baseline": {
+      "n": 1313,
+      "three_way_on_polar_accuracy": 0.8324447829398325,
+      "three_way_on_polar_macro_f1": 0.7403819965780929,
+      "binary_trained_accuracy": 0.9253617669459253,
+      "binary_trained_macro_f1": 0.8177132916270003
+    },
+    "transformer": {
+      "n": 1313,
+      "three_way_on_polar_accuracy": 0.8080731150038081,
+      "three_way_on_polar_macro_f1": 0.7399765495520892,
+      "binary_trained_accuracy": 0.904036557501904,
+      "binary_trained_macro_f1": 0.7849890829694324
+    }
+  },
+  "deployment": {
+    "selected_model": "baseline",
+    "use_case": "CPU-only weekly sentiment reporting for an apparel retailer, 10,000 English reviews/week; minority sentiment visibility is important.",
+    "selection_rule": "Validation macro F1; prefer baseline when within 0.005. Rule does not use test scores or OOD outcomes.",
+    "validation_winner": "baseline",
+    "test_macro_f1_winner": "baseline"
+  },
+  "main_split_hashes": {
+    "train": "425bed305972bfa887f5ed9d95137eb026a0f804c6d3c899819f2fd6b91a7762",
+    "validation": "b5ab50308845c41f0082d2fe48fd68096d0f8b84d27f44393bdff281add56df1",
+    "test": "9be000b31555080298bec49eb0f45511eaae05435f170abb4042cc50c78f1d15"
+  }
+}

@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=77,<82", "wheel>=0.45,<1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "product-review-sentiment-classifier"
+version = "1.0.0"
+description = "An auditable TF-IDF versus fine-tuned BERT comparison on identical real-review splits"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["sentiment-analysis", "scikit-learn", "transformers", "bert", "product-reviews"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Operating System :: OS Independent",
+]
+dynamic = ["dependencies"]
+
+[project.scripts]
+review-sentiment = "sentiment.cli:main"
+
+[tool.setuptools]
+packages = ["sentiment"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = ["work", "models", "data", "reports", "dist", "build"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+"sentiment/report.py" = ["E402"]

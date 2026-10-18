@@ -1,0 +1,5 @@
+{
+  "temperature": 1.718403876544703,
+  "method": "Scalar temperature scaling; minimizes unweighted validation NLL only; never test-fitted.",
+  "validation_id_sha256": "5553bf8f86b53a8e56b2713d457112257820575a50f95a6e125c5376f729d24f"
+}

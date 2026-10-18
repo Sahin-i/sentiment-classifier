@@ -1,0 +1,24 @@
+{
+  "test_suite": {
+    "tests": 19,
+    "passed": 19,
+    "failed": 0,
+    "log": "reports/logs/final_tests.log"
+  },
+  "report_structure": {
+    "sections": 14,
+    "tables": 10,
+    "plots": 3,
+    "local_references_verified": true
+  },
+  "cli_demonstration": {
+    "file": "examples/reviews.txt",
+    "observed_labels_in_order": [
+      "positive",
+      "negative",
+      "neutral"
+    ]
+  },
+  "requirements": "All required features and four bonuses implemented and executed. See report section 13.",
+  "html_preview": "HTML structure/assets verified; all charts visually inspected. Desktop browser preview was unavailable; Markdown report is also supplied."
+}

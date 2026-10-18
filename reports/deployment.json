@@ -1,0 +1,7 @@
+{
+  "selected_model": "baseline",
+  "use_case": "CPU-only weekly sentiment reporting for an apparel retailer, 10,000 English reviews/week; minority sentiment visibility is important.",
+  "selection_rule": "Validation macro F1; prefer baseline when within 0.005. Rule does not use test scores or OOD outcomes.",
+  "validation_winner": "baseline",
+  "test_macro_f1_winner": "baseline"
+}

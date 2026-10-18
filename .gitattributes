@@ -1,0 +1,18 @@
+* text=auto eol=lf
+
+# These are frozen, byte-hashed scientific artifacts. Preserve exact bytes on
+# checkout: CRLF/LF conversion would invalidate the split and provenance hashes.
+/data/** -text -whitespace linguist-generated=true
+/models/** -text -whitespace linguist-generated=true
+/reports/** -text -whitespace
+/reports/predictions/** linguist-generated=true
+/reports/*.json linguist-generated=true
+/reports/report.html linguist-generated=true
+
+*.bin binary
+*.safetensors binary
+*.joblib binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.pdf binary
